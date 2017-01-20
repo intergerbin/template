@@ -1,0 +1,68 @@
+"Development" : {
+    "Description" : "Create a VPC and a public subnet and two private subnet",
+    "Resources" : {
+        "myVPC" : {
+            "Type" : "AWS::EC2::VPC",
+            "Properties" : {
+                "CidrBlock" : "10.0.0.0/16",
+                "EnableDnsSupport" : True,
+                "EnableDnsHostnames" : True,
+                "InstanceTenancy" : "default",
+                "Tags" : [ {"Key" : "Name", "Value" : "myVPC"}
+                ]
+            }
+        },
+        "Public" : {
+            "Type" : "AWS::EC2::Subnet",
+            "Properties" : {
+                "AvailabilityZone" : "ap-northeast-1a",
+                "CidrBlock" : "10.0.0.0/24",
+                "VpcId" : { "Ref" : "myVPC" },
+                "Tags" : [ {"Key" : "Name", "Value" : "PublicSubnet"}
+                ]
+            }
+        },
+        "Private1" : {
+            "Type" : "AWS::EC2::Subnet",
+            "Properties" : {
+                "AvailabilityZone" : "ap-northeast-1a",
+                "CidrBlock" : "10.0.1.0/24",
+                "VpcId" : { "Ref" : "myVPC" },
+                "Tags" : [ {"Key" : "Name", "Value" : "PrivateSubnet2"}
+                ]
+            }    
+        },
+        "Private2" : {
+            "Type" : "AWS::EC2::Subnet",
+            "Properties" : {
+                "AvailabilityZone" : "ap-northeast-1c",
+                "CidrBlock" : "10.0.2.0/24",
+                "VpcId" : { "Ref" : "myVPC" },
+                "Tags" : [ {"Key" : "Name", "Value" : "PrivateSubnet2"}
+                ]
+            }
+        },
+        "myS3Bucket" : {
+            "Type" : "AWS::S3::Bucket"
+            "Properties" : {
+                "BucketName" : "developmemt.test",
+            } 
+        }
+        "S3Endpoint" : {
+            "Type" : "AWS::EC2::VPCEndpoint",
+            "Properties" : {
+            "PolicyDocument" : {
+                "Statement": [{
+                    "Action": "*",
+                    "Effect": "Allow",
+                    "Resource": "*",
+                    "Principal": "*"
+                }]
+            },
+            "RouteTableIds" : [ String, ... ],
+            "ServiceName" : { "Fn::Join": [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".s3" ] ] },
+            "VpcId" : {"Ref" : "myVPC"}
+            }
+        }
+    },
+}
